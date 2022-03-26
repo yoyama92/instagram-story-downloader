@@ -1,0 +1,15 @@
+{
+  "name": "instagram-story-downloader",
+  "description": "インスタのストーリーに保存ボタンを追加するChromeの拡張機能",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/stories/*"
+  ]
+}
