@@ -1,43 +1,43 @@
-(function () {
+(() => {
   const buttonId = "download-button";
 
-  if (document.getElementById(buttonId) == null) {
-    /**
-     * ボタンを追加する。
-     */
-    const appendButton = () => {
-      const el = document.querySelector("div._ac0m");
-      if (el == null) {
-        // ボタンを追加するノードがなければ、1秒待ってから再実行する。
-        setTimeout(appendButton, 1000);
-        return;
-      }
+  /**
+   * ボタンを追加する。
+   */
+  const appendDownloadButton = () => {
+    const el = document.querySelector("div._ac0m");
+    if (el == null) {
+      // ボタンを追加するノードがなければ、1秒待ってから再実行する。
+      setTimeout(appendDownloadButton, 1000);
+      return;
+    }
 
-      if (document.getElementById(buttonId) == null) {
-        const downloadButton = createDownloadButton();
-        el.appendChild(downloadButton);
-      }
-    };
-
-    appendButton();
-  }
+    if (document.getElementById(buttonId) == null) {
+      const downloadButton = createDownloadButtonElement();
+      el.appendChild(downloadButton);
+    }
+  };
 
   /**
    * ダウンロードボタンのelementを生成する。
    * @returns ダウンロードボタン
    */
-  const createDownloadButton = () => {
+  const createDownloadButtonElement = () => {
     const button = document.createElement("button");
     button.innerText = "保存";
     button.id = buttonId;
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const url = getUrl();
+      if (!url) {
+        alert("ファイルを取得できませんでした。");
+        return;
+      }
       // 末尾を取得してファイル名にする。
       const filename = url.pathname.split("/").slice(-1)[0];
 
       // ユーザー名はURLから取得する。
       const username = location.pathname.split("/")[2];
-      downloadFromUrl(url, `${username}_${filename}`);
+      await downloadFromUrl(url, `${username}_${filename}`);
     });
     return button;
   };
@@ -47,23 +47,16 @@
    * @param {*} url ダウンロードするファイルのURL
    * @param {*} fileName ダウンロードするファイルに設定する名前
    */
-  const downloadFromUrl = (url, fileName) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.responseType = "blob";
-    xhr.onload = function (e) {
-      if (this.status == 200) {
-        const url = (window.URL || window.webkitURL).createObjectURL(
-          this.response
-        );
-        const download = document.createElement("a");
-        download.href = url;
-        download.download = fileName;
-        download.click();
-        (window.URL || window.webkitURL).revokeObjectURL(url);
-      }
-    };
-    xhr.send();
+  const downloadFromUrl = async (url, fileName) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = (window.URL || window.webkitURL).createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.setAttribute("href", blobUrl);
+    anchor.setAttribute("download", fileName);
+    anchor.click();
+    (window.URL || window.webkitURL).revokeObjectURL(blobUrl);
   };
 
   /**
@@ -78,5 +71,9 @@
     } else {
       return new URL(document.querySelector("img._aa63").src);
     }
+  };
+
+  if (document.getElementById(buttonId) == null) {
+    appendDownloadButton();
   }
 })();
