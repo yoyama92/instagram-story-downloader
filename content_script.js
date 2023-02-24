@@ -65,11 +65,15 @@
    */
   const getUrl = () => {
     // ストーリーが動画の場合の対応。
-    const video = document.querySelector("video._aa63");
+    const video = document.querySelector("video");
+
     if (video) {
-      return new URL(video.children[0].src);
-    } else {
-      return new URL(document.querySelector("img._aa63").src);
+      return new URL(video.src);
+    }
+
+    const img = document.querySelector("img._aa63");
+    if (img) {
+      return new URL(img.src);
     }
   };
 
