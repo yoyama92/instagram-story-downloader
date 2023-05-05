@@ -1,4 +1,4 @@
-const isComplate = (status) => {
+const isCompleted = (status) => {
   return status === "complete";
 };
 
@@ -10,7 +10,7 @@ const isStoriesPage = (url) => {
 };
 
 chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
-  if (!isComplate(info.status)) {
+  if (!isCompleted(info.status)) {
     return;
   }
 
